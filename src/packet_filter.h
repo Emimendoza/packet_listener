@@ -9,8 +9,6 @@
 namespace packet_filters {
 
 static constexpr sock_filter filter_localhost[]{
-		{BPF_LD | BPF_W | BPF_ABS, 0, 0, ETH_HLEN + offsetof(iphdr, saddr)},
-
 
 };
 }
