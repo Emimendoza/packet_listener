@@ -7,15 +7,20 @@
 #include <netinet/ip.h>
 #include <iostream>
 #include <iomanip>
+#include <arpa/inet.h>
 
 int main () {
-	auto socket = std::make_unique<packet_socket>(SOCK_DGRAM, ETH_P_ALL);
-	while (true) {
-		sockaddr_ll addr{};
-		socklen_t addr_len = sizeof(addr);
-		std::array<unsigned char, 256> buffer{};
-		ssize_t bytes_received = recvfrom(**socket, buffer.data(), buffer.size(), MSG_TRUNC, reinterpret_cast<sockaddr*>(&addr), &addr_len);
-		std::cout << "Received " << bytes_received << " bytes with protocol " << std::hex << std::setw(4) << std::setfill('0') << ntohs(addr.sll_protocol) << " from interface " << static_cast<int>(addr.sll_ifindex) << std::dec << '\n';
+	auto socket = std::make_unique<packet_socket>(SOCK_DGRAM, ETH_P_IP);
+	const in_addr_t localhost = {htonl(INADDR_LOOPBACK)};
+	iphdr
 
+	while (true) {
+		std::array<unsigned char, 4096> buffer{};
+		ip& ip_header = *reinterpret_cast<ip*>(buffer.data());
+		ssize_t bytes_received = recv(**socket, buffer.data(), buffer.size(), MSG_TRUNC);
+		if (ip_header.ip_dst.s_addr == localhost){
+			continue;
+		}
+		std::cout << "Received " << bytes_received << " bytes, from: " << inet_ntoa(ip_header.ip_src) << " to: " << inet_ntoa(ip_header.ip_dst) << std::endl;
 	}
 }
