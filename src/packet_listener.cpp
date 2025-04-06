@@ -38,7 +38,7 @@ void packet_listener::_listen() {
 	auto now = std::time(nullptr);
 	m_event_log << "Packet listener started at " << std::put_time(std::localtime(&now), "%Y-%m-%d %H:%M:%S") << '\n';
 	while (!m_stop_flag.test()) {
-		m_bytes_received = recvfrom(**m_socket, m_buffer.data(), m_buffer.size(), MSG_TRUNC, reinterpret_cast<sockaddr*>(&m_addr), &addr_len);
+		m_bytes_received = recvfrom(**m_socket, m_buffer.data(), m_buffer.size(), 0, reinterpret_cast<sockaddr*>(&m_addr), &addr_len);
 		if (m_bytes_received < 0) {
 			std::cerr << "Error receiving packet: " << std::strerror(errno) << std::endl;
 			continue;
